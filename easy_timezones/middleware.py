@@ -28,6 +28,16 @@ class EasyTimezoneMiddleware(middleware_base_class):
         if not request:
             return
 
+        if (
+            not request.session.session_key
+            and request.method == 'POST'
+        ):
+            # then this is a post which doesn't come with
+            # any session that we may already have for the user.
+            # We don't want to trigger creation of a new session just
+            # because we're updating the timezone info, so bail here instead.
+            return
+
         if not db_loaded:
             load_db()
 
